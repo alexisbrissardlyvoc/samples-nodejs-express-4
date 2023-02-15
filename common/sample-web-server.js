@@ -124,13 +124,19 @@ module.exports = function SampleWebServer(
 
     function refreshTokens(refreshToken, req, res) {
       //Use refresh token to get new token (target token)
+
+      var client_id = sampleConfig.oidc.clientId;
+      var client_secret = sampleConfig.oidc.clientSecret;
+      var base64encoded = Buffer.from(client_id + ":" + client_secret).toString(
+        "base64"
+      );
+
       var options = {
         method: "POST",
         url: "https://lyvoc-oie-demo.oktapreview.com/oauth2/aus6zo3575li4046r1d7/v1/token",
         headers: {
           Accept: "application/json",
-          Authorization:
-            "Basic MG9hNnpjMXAxaG13ejJLZFYxZDc6UlVnYk5tcWFwUTlFUkpUcmNEQW1FbjduNWdWcGxXekZpLXo1N0hwRw==",
+          Authorization: "Basic " + base64encoded,
           "Content-Type": "application/x-www-form-urlencoded",
           Cookie: "JSESSIONID=9A3E6F9B399710C7AF9FFB3E8D02A8AF",
         },
