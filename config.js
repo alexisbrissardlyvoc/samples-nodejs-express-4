@@ -25,7 +25,7 @@ module.exports = {
       clientSecret: CLIENT_SECRET,
       issuer: ISSUER,
       appBaseUrl: 'http://localhost:8080',
-      scope: 'openid profile email',
+      scope: 'openid profile email groupadmin offline_access',
       testing: {
         disableHttpsCheck: OKTA_TESTING_DISABLEHTTPSCHECK
       }

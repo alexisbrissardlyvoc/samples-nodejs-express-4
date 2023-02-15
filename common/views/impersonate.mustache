@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    {{>head}}
+  </head>
+  <body id="samples">
+
+    {{>menu}}
+
+    <div id="content" class="ui padded grid relaxed">
+      <div id="doc" class="column eight wide">
+        <div class="doc-overview">
+          <h2 class="ui dividing header" data-se="overview-doc-header">
+            Actor Profile
+          </h2>
+          <p>You can view the Actor (admin who impersonate a user) informations below.</p>
+          </div>
+        <table class="ui table compact collapsing">
+          <thead>
+            <tr>
+              <th>Claim</th>
+              <th>Value</th>
+            </tr>
+          </thead>
+          <tbody>
+            {{#attributes}}
+              <tr>
+                <td>{{0}}</td>
+                <td id="claim-{{0}}">{{1}}</td>
+              </tr>
+            {{/attributes}}
+          </tbody>
+        </table>
+        <div class="doc-overview">
+          <h2 class="ui dividing header" data-se="overview-doc-header">
+            Target Profile
+          </h2>
+        <p>You can view the Target (user impersonated) informations below.</p>
+        </div>
+        <table class="ui table compact collapsing">
+          <thead>
+            <tr>
+              <th>Claim</th>
+              <th>Value</th>
+            </tr>
+          </thead>
+          <tbody>
+            {{#targetAttributes}}
+              <tr>
+                <td>{{0}}</td>
+                <td id="claim-{{0}}">{{1}}</td>
+              </tr>
+            {{/targetAttributes}}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </body>
+</html>
