@@ -230,6 +230,11 @@ module.exports = function SampleWebServer(
     request(options, function (error, response) {
       if (error) throw new Error(error);
       console.log("/delegate/init response : " + response.body);
+      if (response.body == '{"status":"NOT FOUND"}') {
+        renderHomePage(req, res);
+        return;
+      }
+
       refreshTokens(refreshToken, req, res);
     });
 
