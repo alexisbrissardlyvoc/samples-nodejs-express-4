@@ -12,7 +12,7 @@
         <div class="doc-overview text container">
 
           <h2 class="ui dividing header" data-se="overview-doc-header">
-            Okta Impersonate App Example
+            Okta Impersonate Sample App
           </h2>
 
           {{^isLoggedIn}}
@@ -22,6 +22,33 @@
           {{#isLoggedIn}}
             <p>Welcome back, {{userinfo.name}}!</p>
             <p></p>
+            <h2 class="ui dividing header" data-se="overview-doc-header">
+              Actor Profile
+            </h2>
+            <p>You can view the Actor (admin who impersonate) informations below.</p>
+            </div>
+            <table class="ui table compact collapsing">
+              <thead>
+                <tr>
+                  <th>Attribute</th>
+                  <th>Value</th>
+                </tr>
+              </thead>
+              <tbody>
+                  <tr>
+                    <td>firstName</td>
+                    <td id="given_name">{{userinfo.given_name}}</td>
+                  </tr>
+                  <tr>
+                    <td>lastName</td>
+                    <td id="family_name">{{userinfo.family_name}}</td>
+                  </tr>
+                  <tr>
+                    <td>email</td>
+                    <td id="email">{{userinfo.email}}</td>
+                  </tr>
+              </tbody>
+            </table>
           {{/isLoggedIn}}
 
           {{^isLoggedIn}}
@@ -29,19 +56,28 @@
               <button id="login-button" class="ui primary button" type="submit">Log In</button>
             </form>
           {{/isLoggedIn}}
-        </div>
-        {{#isLoggedIn}}
-          <div class="doc-overview">
+          {{#isLoggedIn}}
             <h2 class="ui dividing header" data-se="overview-doc-header">
               Impersonation
             </h2>
-            <p>You can impersonate another user by clicking the button below.
+            <p>To impersonate a user, choose one in the list below, then click the "Impersonate" button.
             </p>
-          </div>
-          <a id="impersonate-button" data-se="impersonate" class="item" href="/impersonate">
-            Impersonate
-          </a>
-        {{/isLoggedIn}}
+            <form method="post" action="/impersonate">
+              <datalist id="user-selection">
+                  <option>test.renaultimpersonation@yopmail.com</option>
+                  <option>test2.renaultimpersonation@yopmail.com</option>
+                  <option>test3.renaultimpersonation@yopmail.com</option>
+              </datalist>
+              <input id="target-email" name="targetEmail" autoComplete="on" list="user-selection" pattern="^(test.renaultimpersonation@yopmail.com|test2.renaultimpersonation@yopmail.com|test3.renaultimpersonation@yopmail.com)$"/>
+              <button id="impersonate-button" data-se="impersonate" class="item" action="/impersonate" method="post">
+              Impersonate
+              </button>
+            </form>
+          {{/isLoggedIn}}
+        </div>
+      {{#isLoggedIn}}
+        {{>admin-panel}}
+      {{/isLoggedIn}}
       </div>
     </div>
   </body>

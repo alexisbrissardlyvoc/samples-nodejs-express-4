@@ -45,6 +45,8 @@ module.exports = function SampleWebServer(
   );
 
   const app = express();
+  const bodyParser = require("body-parser");
+  app.use(bodyParser({ extended: false }));
 
   app.use(
     session({
@@ -102,6 +104,9 @@ module.exports = function SampleWebServer(
     //console.log("Access token : " + accessToken);
     //console.log("Refresh token : " + refreshToken);
 
+    // const targetEmail = $("#target-email").val();
+    // console.log("Target email : " + targetEmail);
+
     // Send /delegate/init request to AWS API Gateway, then refresh tokens and render home page
     var request = require("request");
     var options = {
@@ -113,6 +118,112 @@ module.exports = function SampleWebServer(
       },
       body: JSON.stringify({
         delegation_target: "test.renaultimpersonation@yopmail.com",
+      }),
+    };
+
+    request(options, function (error, response) {
+      if (error) throw new Error(error);
+      console.log("/delegate/init response : " + response.body);
+      refreshTokens(refreshToken, req, res);
+    });
+
+    function refreshTokens(refreshToken, req, res) {
+      //Use refresh token to get new token (target token)
+
+      var client_id = sampleConfig.oidc.clientId;
+      var client_secret = sampleConfig.oidc.clientSecret;
+      var base64encoded = Buffer.from(client_id + ":" + client_secret).toString(
+        "base64"
+      );
+
+      var options = {
+        method: "POST",
+        url: "https://lyvoc-oie-demo.oktapreview.com/oauth2/aus6zo3575li4046r1d7/v1/token",
+        headers: {
+          Accept: "application/json",
+          Authorization: "Basic " + base64encoded,
+          "Content-Type": "application/x-www-form-urlencoded",
+          Cookie: "JSESSIONID=9A3E6F9B399710C7AF9FFB3E8D02A8AF",
+        },
+        form: {
+          grant_type: "refresh_token",
+          redirect_uri: "https://oidcdebugger.com/debug",
+          scope: sampleConfig.oidc.scope,
+          refresh_token: refreshToken,
+        },
+      };
+      request(options, function (error, response) {
+        if (error) throw new Error(error);
+        console.log("Refresh response received");
+        var jsonResponse = JSON.parse(response.body);
+        var newAccessToken = jsonResponse.access_token;
+        var newIdToken = jsonResponse.id_token;
+        //console.log("New access token : " + newAccessToken);
+        //console.log("New id token : " + newIdToken);
+
+        //Decode access token to get user info
+        var jwt = require("jsonwebtoken");
+        var decoded = jwt.decode(newAccessToken, { complete: true });
+        //console.log("Decoded access token : " + JSON.stringify(decoded));
+        var targetUserInfos = decoded.payload.user_context;
+        //console.log("Target User infos : " + targetUserInfos);
+
+        //Update access token in session
+        req.userContext.tokens.access_token = newAccessToken;
+        //req.userContext.tokens.id_token = newIdToken;
+        renderImpersonatePage(req, res, targetUserInfos);
+      });
+    }
+
+    function renderHomePage(req, res) {
+      //Render home page with new information
+      const template = homePageTemplateName || "home";
+      const userinfo = req.userContext && req.userContext.userinfo;
+
+      res.render(template, {
+        isLoggedIn: !!userinfo,
+        userinfo: userinfo,
+      });
+    }
+
+    function renderImpersonatePage(req, res, targetUserInfos) {
+      //Render impersonate page
+      const userinfo = req.userContext && req.userContext.userinfo;
+      const attributes = Object.entries(userinfo);
+      const targetAttributes = Object.entries(targetUserInfos);
+
+      res.render("impersonate", {
+        isLoggedIn: !!userinfo,
+        userinfo: userinfo,
+        attributes,
+        targetAttributes,
+      });
+    }
+  });
+
+  app.post("/impersonate", (req, res) => {
+    const tokenSet = req.userContext.tokens;
+    const accessToken = tokenSet.access_token;
+    const refreshToken = tokenSet.refresh_token;
+    //console.log("Access token : " + accessToken);
+    //console.log("Refresh token : " + refreshToken);
+
+    const body = req.body;
+
+    const targetEmail = body.targetEmail;
+    console.log("Target email : " + targetEmail);
+
+    // Send /delegate/init request to AWS API Gateway, then refresh tokens and render home page
+    var request = require("request");
+    var options = {
+      method: "POST",
+      url: "https://fo4ajcesi5.execute-api.eu-west-3.amazonaws.com/Deployed/delegate/init",
+      headers: {
+        Authorization: "Bearer " + accessToken,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        delegation_target: targetEmail,
       }),
     };
 
