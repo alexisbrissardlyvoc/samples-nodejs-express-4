@@ -28,7 +28,7 @@ module.exports = {
       clientSecret: CLIENT_SECRET,
       issuer: ISSUER,
       appBaseUrl:
-        "http://ec2-35-180-186-50.eu-west-3.compute.amazonaws.com:8080",
+        "http://ec2-35-180-98-165.eu-west-3.compute.amazonaws.com:8080",
       scope: "openid profile email groupadmin offline_access",
       testing: {
         disableHttpsCheck: OKTA_TESTING_DISABLEHTTPSCHECK,
